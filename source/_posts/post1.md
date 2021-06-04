@@ -1,6 +1,8 @@
 ---
 title: FFmpeg编译与依赖库安装
 date: 2021-06-03 22:04:30
+tags:
+-ffmpeg
 ---
 # 前言
 
