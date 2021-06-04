@@ -1,10 +1,10 @@
 ---
-title: article2
+title: FFMpeg命令分类
 date: 2021-06-04 13:24:41
-tags:
- _ffmpeg
+
 ---
-﻿# FFMpeg命令分类
+# 概述
+根据FFmpeg命令的功能分成八大类，详细的使用可以参照《FFmpeg从入门到精通这本书》
 
 > ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603225216334.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)
 
