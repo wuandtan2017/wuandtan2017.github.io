@@ -7,13 +7,13 @@ date: 2021-06-04 13:24:41
 
 本文主要介绍FFmpeg的命令分类及基本的使用，具体请参照《FFmpeg从入门到精通》
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603225216334.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)  
+![FFmpeg命令分类](https://img-blog.csdnimg.cn/20210603225216334.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)  
 
 ***
 
 ## 1.信息查询命令
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210603225327708.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)
+![基本信息查询命令列表](https://img-blog.csdnimg.cn/20210603225327708.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)
 
 ## 2.录制命令
 
@@ -75,7 +75,7 @@ ffmpeg -f concat -i inputs.txt out.flv
 
 
 -f concat 对后面的文件进行拼接 inputs.txt 内容为 'file filename'格式。file内容如下，和裁切片段一个目录下，采用相对路径
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210604124948452.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)
+![file文件内容](https://img-blog.csdnimg.cn/20210604124948452.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70)
 
 ## 7.图片与视频命令互转
 #### 视频转图片
@@ -87,7 +87,7 @@ ffmpeg -f concat -i inputs.txt out.flv
 -r 1 1秒钟一张图片
 -f image2图片格式 
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2021060412573361.png)
+![转图片结果](https://img-blog.csdnimg.cn/2021060412573361.png)
 #### 图片转视频 
 
 ffmpeg -i image-%3d.jpeg out.mp4 ffplay -r 1 hello.mp4
