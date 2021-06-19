@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      0 字
+      2.2k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      23
        分钟
     </span>
   
@@ -228,9 +228,7 @@
             <h1 style="display: none">H264编码原理</h1>
             
             <div class="markdown-body">
-              <hr style=" border:solid; width:100px; height:1px;" color=#000000 size=1">
-
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文将从H264的发展历史开始，详细介绍H264编码的原理以及涉及的知识点，作为个人学习的总结。</p>
+              <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文将从H264的发展历史开始，详细介绍H264编码的原理以及涉及的知识点，作为个人学习的总结。</p>
 <h1 id="一、H264概述"><a href="#一、H264概述" class="headerlink" title="一、H264概述"></a>一、H264概述</h1><p>对于未入门的人可能会对命名有点疑惑,比如对于H.264, 还会看到有些标签还写成MPEG-4/AVC，这是什么原因呢？</p>
 <p>可以简单理解为视频编码格式的制定主要有两大门派，本来H.26X系统由ITU-T主导开发, MPEG系列由ISO主导开发，然后两大门派合作开发了H.264 和H.265 , H.264,H.265是ITU组织对着两种编码格式的命名, MPEG-4/AVC ,MPEG-4/HEVC是ISO组织对这两种编码格式的命名。以下的图片展示了视频编码格式的发展。<br><img src="https://img-blog.csdnimg.cn/20210619163700484.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">   </p>
 <h1 id="二、H264压缩码率和GOP"><a href="#二、H264压缩码率和GOP" class="headerlink" title="二、H264压缩码率和GOP"></a>二、H264压缩码率和GOP</h1><h2 id="压缩比和码率设置"><a href="#压缩比和码率设置" class="headerlink" title="压缩比和码率设置"></a>压缩比和码率设置</h2><p>原始YUV数据像素格式为YUV420，分辨率为640x480，帧率为15帧，计算得到原始视频数据码流为55Mbps左右，而H264建议的码流大小为500kbps，结果显示，H264压缩比达到1/100左右！</p>
