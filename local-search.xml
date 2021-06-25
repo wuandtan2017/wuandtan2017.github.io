@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>FFmpegDemo—打印音视频Meta信息</title>
+    <link href="/2021/06/26/FFmpegDemo%E2%80%94%E6%89%93%E5%8D%B0%E9%9F%B3%E8%A7%86%E9%A2%91Meta%E4%BF%A1%E6%81%AF/"/>
+    <url>/2021/06/26/FFmpegDemo%E2%80%94%E6%89%93%E5%8D%B0%E9%9F%B3%E8%A7%86%E9%A2%91Meta%E4%BF%A1%E6%81%AF/</url>
+    
+    <content type="html"><![CDATA[<h2 id="1-主要的API"><a href="#1-主要的API" class="headerlink" title="1. 主要的API"></a>1. 主要的API</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Print detailed information about the input or output format, such as</span><br><span class="hljs-comment"> * duration, bitrate, streams, container, programs, metadata, side data,</span><br><span class="hljs-comment"> * codec and time base.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * @param ic        the context to analyze</span><br><span class="hljs-comment"> * @param index     index of the stream to dump information about</span><br><span class="hljs-comment"> * @param url       the URL to print, such as source or destination file</span><br><span class="hljs-comment"> * @param is_output Select whether the specified context is an input(0) or output(1)</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">av_dump_format</span><span class="hljs-params">(AVFormatContext *ic, <span class="hljs-keyword">int</span> index, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *url, <span class="hljs-keyword">int</span> is_output)</span></span>;<br></code></pre></td></tr></table></figure><h2 id="2-一个结构体"><a href="#2-一个结构体" class="headerlink" title="2. 一个结构体"></a>2. 一个结构体</h2><p>AVFormatContext，具体的结构体介绍可以看雷神这篇文章</p><p><a href="https://blog.csdn.net/leixiaohua1020/article/details/14214705">AVFormat结构体介绍</a></p><h2 id="3-代码"><a href="#3-代码" class="headerlink" title="3.代码"></a>3.代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;libavutil/log.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;libavformat/avformat.h&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc,<span class="hljs-keyword">char</span>* argv[])</span></span><br><span class="hljs-function"></span>&#123;<br><br>    <span class="hljs-keyword">int</span> ret;<br>    AVFormatContext *fmt_ctx = <span class="hljs-literal">NULL</span>;<br><br>    av_log_set_level(AV_LOG_INFO);<br><br>    av_register_all();<br><br>    avformat_open_input(&amp;fmt_ctx,<span class="hljs-string">&quot;/opt/sucai/test.mp4&quot;</span>,<span class="hljs-literal">NULL</span>,<span class="hljs-literal">NULL</span>);<br><br>    <span class="hljs-keyword">if</span>(ret&lt;<span class="hljs-number">0</span>)&#123;<br>        av_log(<span class="hljs-literal">NULL</span>,AV_LOG_ERROR,<span class="hljs-string">&quot;Can&#x27;t open file: %s\n&quot;</span>,av_err2str(ret));<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br><br>    av_dump_format(fmt_ctx,<span class="hljs-number">0</span>,<span class="hljs-string">&quot;/opt/sucai/test.mp4&quot;</span>,<span class="hljs-number">0</span>);<br>    avformat_close_input(&amp;fmt_ctx);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br></code></pre></td></tr></table></figure><h2 id="4-执行结果分析"><a href="#4-执行结果分析" class="headerlink" title="4.执行结果分析"></a>4.执行结果分析</h2><p>执行结果如下<br><img src="https://img-blog.csdnimg.cn/20210625235807535.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">#0代表流的索引值<br>Metadata与FFmpeg版本有关</p><p>Stream#0,第一路视频流，编码格式为h265；分辨率1280x720；码率1008kb/s；帧率25帧/s；25  tbr代表帧率；12800 tbn代表文件层（st）的时间精度，即1S=12800，和duration相关；</p><p>Stream#1，第二路音频流，编码格式aac，采样频率48000Hz，双声道，码率192kb/s</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>FFmpeg</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>FFmpegDemo</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>WebRTC概述</title>
     <link href="/2021/06/20/WebRTC%E6%A6%82%E8%BF%B0/"/>
     <url>/2021/06/20/WebRTC%E6%A6%82%E8%BF%B0/</url>
