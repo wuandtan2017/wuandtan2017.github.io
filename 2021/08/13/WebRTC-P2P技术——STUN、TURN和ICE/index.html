@@ -233,7 +233,7 @@
 <p>家庭和办公网络环境大多是经过NAT路由中转的方式联网。这也意味着在家PC通过WIFI联网，在PC上通过命令行（ifconfig）查看到的IP地址（内网），跟通过baidu查看到的IP地址（公网），不一样，这也能证明PC处于NAT后面。</p>
 <p>首先介绍一下NAT的分类以及NAT打洞原理。</p>
 <h2 id="NAT分类"><a href="#NAT分类" class="headerlink" title="NAT分类"></a>NAT分类</h2><p><strong>完全锥形 Full Cone</strong></p>
-<p>![](<a target="_blank" rel="noopener" href="https://img-blog.csdnimg.cn/74e7f306a1f641dbb4e161ef92cd9999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center">https://img-blog.csdnimg.cn/74e7f306a1f641dbb4e161ef92cd9999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center</a> =300x150)<br>内部机器A访问外网机器C，NAT打开一个端口，后面外网的任意ip和任意port都可以访问这个端口，也就是任意ip+任意port可以访问内网机器A。</p>
+<p><img src="https://img-blog.csdnimg.cn/74e7f306a1f641dbb4e161ef92cd9999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" lazyload><br>内部机器A访问外网机器C，NAT打开一个端口，后面外网的任意ip和任意port都可以访问这个端口，也就是任意ip+任意port可以访问内网机器A。</p>
 <p>缺点：安全性不好，因为可以被任意ip和端口访问</p>
 <p><strong>地址限制锥形 Address Restricted Cone</strong></p>
 <p><img src="https://img-blog.csdnimg.cn/c21a7a184a5c406a9cc4f947e0da5cf7.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" lazyload><br>​ 内部机器A访问外网机器C，NAT打开一个端口，后面机器C的任意port可以访问这个端口，就是只能固定ip+任意port访问A</p>
@@ -260,7 +260,7 @@
 <p>NAT 的中继穿越方式 Traversal Using Relays around NAT (TURN) 通过 TURN 服务器中继所有数据的方式来绕过“对称型 NAT”。你需要在 TURN 服务器上创建一个连接，然后告诉所有对端设备发包到服务器上，TURN 服务器再把包转发给你。很显然这种方式是开销很大的，所以只有在没得选择的情况下采用。</p>
 <h1 id="4-ICE"><a href="#4-ICE" class="headerlink" title="4.ICE"></a>4.ICE</h1><p>综上所述，STUN的目的是为了进行P2P通信，通过提供反射地址（Server Reflexive Address）这种能力来使双方可以进行P2P通信，但是依赖NAT类型的不同，这种方式是有失败的概率的：比如双方都为对称型NAT或者一方为对称型，另一方为端口限制型。</p>
 <p>因为有失败的可能性，所以单纯的依赖STUN协议提供的反射地址的话，需要事先探测出双方的NAT类型，假如发现是对称型的NAT，那么就不打洞了，而是直接中转。目前网络类型纷繁复杂，STUN协议在5389的时候去掉了NAT类型的判断的能力，因为越来越多的实践发现，在多层NAT下，类型的探测不总是有效的。而使用ICE的时候，不需要事先探测NAT类型。STUN还有一个作用是为ICE提供支持(对Binding的扩展)。</p>
-<p>TURN协议的目的是为了保证通信双方百分之百能进行通信，就是在只知道反射地址而打洞失败的情况下的一种补充方案—–使用中继，使用中继方式百分之百能使得双方进行通信，只不过已经不是P2P的了，而且伴随而来的是转发效率的问题。不过这不要紧，因为该协议的目的就是保证双方肯定能通信，损失效率来保证了连同性。<br><img src="https://img-blog.csdnimg.cn/a64a1ff4ea354d15a663f039533e7bfd.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>TURN协议的目的是为了保证通信双方百分之百能进行通信，就是在只知道反射地址而打洞失败的情况下的一种补充方案—–使用中继，使用中继方式百分之百能使得双方进行通信，只不过已经不是P2P的了，而且伴随而来的是转发效率的问题。不过这不要紧，因为该协议的目的就是保证双方肯定能通信，损失效率来保证了连同性。<br><img src="https://img-blog.csdnimg.cn/a64a1ff4ea354d15a663f039533e7bfd.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" lazyload></p>
 <p><strong>ICE协议的目的就是综合以上两种方案，通过通信双方互相发探测包，找出一种最合理，最廉价的可行路径。</strong></p>
 <p>ICE首先探测内网地址，再探测STUN提供的反射地址，最后探测TURN协议的中继地址，反正最终目的就是探出一条路，内网地址不行用反射地址，反射地址不行，最后不得已情况下那就用中继地址。</p>
 
