@@ -233,7 +233,7 @@
 <p>家庭和办公网络环境大多是经过NAT路由中转的方式联网。这也意味着在家PC通过WIFI联网，在PC上通过命令行（ifconfig）查看到的IP地址（内网），跟通过baidu查看到的IP地址（公网），不一样，这也能证明PC处于NAT后面。</p>
 <p>首先介绍一下NAT的分类以及NAT打洞原理。</p>
 <h2 id="NAT分类"><a href="#NAT分类" class="headerlink" title="NAT分类"></a>NAT分类</h2><p><strong>完全锥形 Full Cone</strong></p>
-<p><img src="https://img-blog.csdnimg.cn/74e7f306a1f641dbb4e161ef92cd9999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" lazyload><br>内部机器A访问外网机器C，NAT打开一个端口，后面外网的任意ip和任意port都可以访问这个端口，也就是任意ip+任意port可以访问内网机器A。</p>
+<p>![](<a target="_blank" rel="noopener" href="https://img-blog.csdnimg.cn/74e7f306a1f641dbb4e161ef92cd9999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center">https://img-blog.csdnimg.cn/74e7f306a1f641dbb4e161ef92cd9999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center</a> =300x150)<br>内部机器A访问外网机器C，NAT打开一个端口，后面外网的任意ip和任意port都可以访问这个端口，也就是任意ip+任意port可以访问内网机器A。</p>
 <p>缺点：安全性不好，因为可以被任意ip和端口访问</p>
 <p><strong>地址限制锥形 Address Restricted Cone</strong></p>
 <p><img src="https://img-blog.csdnimg.cn/c21a7a184a5c406a9cc4f947e0da5cf7.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" lazyload><br>​ 内部机器A访问外网机器C，NAT打开一个端口，后面机器C的任意port可以访问这个端口，就是只能固定ip+任意port访问A</p>
