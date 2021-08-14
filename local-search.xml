@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>FFmpeg开发——深入理解pts，dts和timebase</title>
+    <link href="/2021/08/14/FFmpeg%E5%BC%80%E5%8F%91%E2%80%94%E2%80%94%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3pts%EF%BC%8Cdts%E5%92%8Ctimebase/"/>
+    <url>/2021/08/14/FFmpeg%E5%BC%80%E5%8F%91%E2%80%94%E2%80%94%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3pts%EF%BC%8Cdts%E5%92%8Ctimebase/</url>
+    
+    <content type="html"><![CDATA[<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>本文将以具体视频播放器开发过程中遇到的具体问题，来系统地阐释pts，dts和timebase的概念。</p><h1 id="1-时间基"><a href="#1-时间基" class="headerlink" title="1.时间基"></a>1.时间基</h1><p>在FFmpeg开发中，经常会遇到结构体中有time_base这个成员，通过头文件查看他的类型是AVRational</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">AVRational</span>&#123;</span><br>    <span class="hljs-keyword">int</span> num; <span class="hljs-comment">///&lt; numerator</span><br>    <span class="hljs-keyword">int</span> den; <span class="hljs-comment">///&lt; denominator</span><br>&#125; AVRational;<br></code></pre></td></tr></table></figure><p>那么AVRational到底表示了什么呢？</p><p>AVRational这个结构标识一个分数，num为分子，den为分母。实际上time_base的意思就是时间的刻度。</p><p>如果把1秒分为25等份，你可以理解就是一把尺，那么每一格表示的就是1/25秒。此时的time_base={1，25}。如果你是把1秒分成90000份，每一个刻度就是1/90000秒，此时的time_base={1，90000}。所谓时间基表示的就是每个刻度是多少秒。<br>那么，在刻度为1/25的体系下的time=5，转换成在刻度为1/90000体系下的时间time为(5x1/25)/(1/90000) = 3600*5=18000</p><p>正是由于不同的封装格式，timebase是不一样的。另外，整个转码过程，不同的数据状态对应的时间基也不一致。所以在实际开发过程中，存在着大量时间基的转换。</p><h1 id="2-PTS和DTS"><a href="#2-PTS和DTS" class="headerlink" title="2.PTS和DTS"></a>2.PTS和DTS</h1><p><strong>PTS</strong>：Presentation Time Stamp。PTS 主要用于度量解码后的视频帧什么时候被显示出来。<br><strong>DTS</strong>：Decode Time Stamp。DTS 主要是标识读入内存中的Bit流在什么时候开始送入解码器中进行解码。</p><p><font color=#999AAA >虽然 DTS、PTS 是用于指导播放端的行为，但它们是在编码的时候由编码器生成的。当视频流中没有 B 帧时，通常 DTS 和 PTS 的顺序是一致的。但如果有 B 帧时，解码顺序和播放顺序不一致了。</font></p><p>来看一个具体的例子，利用雷神做的videoeye视频码流分析软件，来对视频文件进行分析，这个文件是mp4格式的，可以看到视频码流PTS在递增，这就是我们看到画面的顺序，但是码流顺序并不是递增的，这里的码流顺序可理解为解码的顺序，也就是DTS表示的意思，先解I帧，再解P帧，依次解中间的B帧</p><p><img src="https://img-blog.csdnimg.cn/de079492fdf24da0a5dad99f0c8f281c.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center"></p><p>而音频的解码顺序就是我们依次听到的顺序，PTS和DTS相等</p><p><img src="https://img-blog.csdnimg.cn/7dbc87c806d54fb0a48a877a5e59996d.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d1Z2VidWN1bw==,size_16,color_FFFFFF,t_70#pic_center"></p><p>怎么理解PTS数值表达的含义呢，如果有某一帧，假设它是第10秒开始显示。那么它的pts是多少呢。是10？还是10s？还是两者都不是。</p><p><strong>这就引出了pts和dts的值到底代表了什么含义这个问题</strong></p><p>pts和dts的值指的是占多少个时间刻度（占多少个格子）。它的单位不是秒，而是时间刻度。只有pts与time_base两者结合在一起，才能表达出具体的时间是多少。好比我只告诉你，某个物体的长度占某一把尺上的20个刻度。但是我不告诉你，每个刻度是多少厘米，你仍然无法知道物体的长度。pts 就是这样的东西，pts(占了多少个时间刻度) ，time_base(每个时间刻度是多少秒) ，而帧的显示时间戳 =  pts(占了多少个时间刻度)  * time_base(每个时间刻度是多少秒)。</p><h1 id="3-一些开发过程中时间基转换的场景"><a href="#3-一些开发过程中时间基转换的场景" class="headerlink" title="3.一些开发过程中时间基转换的场景"></a>3.一些开发过程中时间基转换的场景</h1><p><strong>3.1 计算视频总时长</strong></p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">AVFormatContext *ifmt_ctx = <span class="hljs-literal">NULL</span>;<br>avformat_open_input(&amp;ifmt_ctx, filename, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);<br><span class="hljs-keyword">int</span> totalMs;<span class="hljs-comment">//视频总毫秒数</span><br>totalMs = ifmt_ctx-&gt;duration / (AV_TIME_BASE / <span class="hljs-number">1000</span>);<br></code></pre></td></tr></table></figure><p><strong>3.2 根据PTS求出一帧在视频中对应的秒数位置</strong></p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">double</span> sec = enc_pkt.pts * av_q2d(ofmt_ctx-&gt;streams[stream_index]-&gt;time_base);<br></code></pre></td></tr></table></figure><p><strong>3.3 ffmpeg内部的时间戳与标准的时间转换方法</strong></p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//timestamp为ffmpeg内部时间戳，time为正常时间戳，单位为秒</span><br>timestamp = AV_TIME_BASE * time<br>time = AV_TIME_BASE_Q * timestamp<br></code></pre></td></tr></table></figure><p>AV_TIME_BASE这个宏为1000000，由此我们可以发现ffmpeg内部时间戳是以微秒(μs)为单位的</p><p><strong>3.4 当需要把视频Seek到N秒的时候</strong></p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//pos单位毫秒</span><br><span class="hljs-keyword">double</span> pos;<br>seekPos = ifmtctx-&gt;streams[videoStream]-&gt;duration * pos;<br>av_seek_frame(ifmtctx, videoStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>FFmpeg</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>音视频原理</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>WebRTC P2P技术——STUN、TURN和ICE</title>
     <link href="/2021/08/13/WebRTC-P2P%E6%8A%80%E6%9C%AF%E2%80%94%E2%80%94STUN%E3%80%81TURN%E5%92%8CICE/"/>
     <url>/2021/08/13/WebRTC-P2P%E6%8A%80%E6%9C%AF%E2%80%94%E2%80%94STUN%E3%80%81TURN%E5%92%8CICE/</url>
