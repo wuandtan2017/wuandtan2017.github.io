@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>WebRTC源码下载与编译</title>
+    <link href="/2022/04/27/WebRTC%E6%BA%90%E7%A0%81%E4%B8%8B%E8%BD%BD%E4%B8%8E%E7%BC%96%E8%AF%91/"/>
+    <url>/2022/04/27/WebRTC%E6%BA%90%E7%A0%81%E4%B8%8B%E8%BD%BD%E4%B8%8E%E7%BC%96%E8%AF%91/</url>
+    
+    <content type="html"><![CDATA[<h1 id="1-几种源码下载方案对比"><a href="#1-几种源码下载方案对比" class="headerlink" title="1 几种源码下载方案对比"></a>1 几种源码下载方案对比</h1><p>一共四种方法，除了云服务器没试之外把能踩的坑都踩了一遍，最后使用的是挂代理的方法，这种方法是效率最高的。</p><h2 id="1-1-拉别人下好的代码"><a href="#1-1-拉别人下好的代码" class="headerlink" title="1.1 拉别人下好的代码"></a>1.1 拉别人下好的代码</h2><p>最快，但是遇到问题不好解决。一开始直接拉了别人的百度网盘拉下来的代码，编译报错，错误在网上搜不到，分析了半天也没解决，只能放弃。</p><h2 id="1-2云服务器"><a href="#1-2云服务器" class="headerlink" title="1.2云服务器"></a>1.2云服务器</h2><p>这种方法看别人成功了，但是云服务器得买国外的就不会被墙了，而且云服务器操作不太方便，如果看代码的话都得在云服务器上面，花费略高。</p><h2 id="1-3-国内镜像"><a href="#1-3-国内镜像" class="headerlink" title="1.3 国内镜像"></a>1.3 国内镜像</h2><p>国内都是对代码做了镜像，很多依赖库还是得挂代理，还要替换git仓库地址，操作复杂。而且操作了半天还是失败了，应该是之前用的代理服务器不靠谱，依赖不完整。</p><h2 id="1-4-挂代理（推荐）"><a href="#1-4-挂代理（推荐）" class="headerlink" title="1.4 挂代理（推荐）"></a>1.4 挂代理（推荐）</h2><p>这种方式最省心，我用的IGuGe扩展加Clash，很稳定，一遍就成功了，IGuGe是付费的，18块钱一个月，在晚上测试的时候可以把带宽跑满，大概拉了二十分钟就拉完了，代码完整无异常。</p><h1 id="2-源码编译环境准备"><a href="#2-源码编译环境准备" class="headerlink" title="2 源码编译环境准备"></a>2 源码编译环境准备</h1><h2 id="2-1-环境要求"><a href="#2-1-环境要求" class="headerlink" title="2.1 环境要求"></a>2.1 环境要求</h2><ul><li>WebRTC要求是 64位机器 8G 内存。</li><li>至少 100G 磁盘空间，NTFS格式。</li><li>用一台干净的机器来编译WebRTC，安装过python的会出现一些非常棘手的问题，安装depot_tools会安装python，把原来机子上的python删掉最好，这样能确保一遍成功。</li><li>操作系统我用的是win10，win11没试过。</li><li>安装visual studio，社区版即可，我用的是VS2022，安装路径务必选C盘。</li><li>安装win10SDK，并安装“Debugging Tools For Windows”。 </li></ul><h2 id="2-2-代理服务器配置"><a href="#2-2-代理服务器配置" class="headerlink" title="2.2 代理服务器配置"></a>2.2 代理服务器配置</h2><p>在edge的扩展里搜索iGG谷歌学术助手，安装完以后登录账号打开，点击“客户端下载与订阅“。然后下载Clash Windows客户端，在Clash配置选项中，将IGG配置与订阅中的Clash订阅码粘贴到URL空白里然后点击下载就可以在客户端中使用了。节点会自动选择，不需要自己配置。<br><img src="https://img-blog.csdnimg.cn/6dc4f401702d44d2808298b86b1a0367.png" alt="在这里插入图片描述"><br>然后右键点击Clash的系统托盘图标，确保开启了系统代理和全局模式。<br>查看代理是否已开启，记住端口号。<br><img src="https://img-blog.csdnimg.cn/241a891166254eadb99302fac326c5fd.png" alt="在这里插入图片描述"><br>打开谷歌或者youtube测试一下，如果访问ok的话代理就设置成功了。</p><h2 id="2-3-VS和Win10SDK安装配置"><a href="#2-3-VS和Win10SDK安装配置" class="headerlink" title="2.3 VS和Win10SDK安装配置"></a>2.3 VS和Win10SDK安装配置</h2><p> 我的VS配置如下图所示<br><img src="https://img-blog.csdnimg.cn/c258cb50e348433ab9f127d831f6a738.png" alt="在这里插入图片描述">关于Win10SDK的版本问题，之前安装的时候只勾选了19041版本的，没有勾选18042，执行ninja命令报错unknow type name，后来看了别人的博客，把几个SDK都装了就没问题了，我把18042装上以后就不报错了，应该是SDK的版本问题，多装一些没事，装少了报的错误莫名其妙的，错一点点都编译不起来，真的是给搞怕了，比ffmpeg难编多了。</p><h2 id="2-4-depot-tools安装"><a href="#2-4-depot-tools安装" class="headerlink" title="2.4 depot_tools安装"></a>2.4 depot_tools安装</h2><p>depot_tools就是一堆下载代码，编译等相关的工具，Google统一打包在 depot_tools中，你需将它下载到本地。这里需要注意，完整的depot_tools大概1个G左右，有的人给的depot_tools压缩包不完整，还需要执行gclient才能获得完整的depot_tools，执行gclient也需要代理服务器，前面我们已经配置了代理服务器，这一步我们直接从git上面拉取即可。完整的depot_tools工具安装方式如下。</p><ul><li>1.安装git并获取depot_tools<br>git的配置就不解释了，在windows下面把git配置好就行了。配置完毕以后新建一个文件夹，在当前目录下执行<br>cmd命令行执行：<br>set http_proxy=127.0.0.1:xxxx;（xxxx为你的代理服务器的端口号）<br>set https_proxy=127.0.0.1:xxxx<br>git bash里执行：<br>export http_proxy=127.0.0.1:xxxx;<br>export https_proxy=127.0.0.1:xxxx<br>然后再执行<br>git clone <a href="https://chromium.googlesource.com/chromium/tools/depot_tools.git">https://chromium.googlesource.com/chromium/tools/depot_tools.git</a><br>depot_tools目录如下所示<br><img src="https://img-blog.csdnimg.cn/a8852c534a9340bd8e1670593daa817f.png" alt="在这里插入图片描述"></li><li>2.配置depot_tools 环境变量</li></ul><p><img src="https://img-blog.csdnimg.cn/e3428673689e42158afb0a15e1f64c8c.png" alt="在这里插入图片描述"><br>将depot_tools目录添加到环境变量，并且配置DEPOTTOOLSWIN_TOOLCHAIN为0，这个变量配置后，gclient sync会下载buildtools。配置完成记得重启让环境变量生效。</p><ul><li>3.执行一下gclient，安装Windows下所需的工具<br>重启完成后，在cmd中执行gclient，等待下载，挂了代理的话这一步是不会报错的，下载完成后执行一下gclient，如图所示就是成功了。<br><img src="https://img-blog.csdnimg.cn/fdd68fcdee9a4cb9ba79c5f79f182e4d.png" alt="在这里插入图片描述"><h1 id="3-WebRTC源码下载与编译"><a href="#3-WebRTC源码下载与编译" class="headerlink" title="3 WebRTC源码下载与编译"></a>3 WebRTC源码下载与编译</h1><h2 id="3-1源码下载"><a href="#3-1源码下载" class="headerlink" title="3.1源码下载"></a>3.1源码下载</h2>先创建一个文件夹，再执行fetch命令<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkdir webrtc-checkout<br><span class="hljs-built_in">cd</span> webrtc-checkout<br>fetch --nohooks webrtc<br>gclient sync<br></code></pre></td></tr></table></figure>执行完是这样的<br><img src="https://img-blog.csdnimg.cn/eb67c28519e0470c9ed3c5fcd43c4eef.png" alt="在这里插入图片描述"><h2 id="3-2源码编译"><a href="#3-2源码编译" class="headerlink" title="3.2源码编译"></a>3.2源码编译</h2>代码下载完以后就开始编译源码，先cd到src文件夹中,再执行<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">cd</span> src<br>$ gn gen out/Default<br>$ ninja -C out/Default<br></code></pre></td></tr></table></figure>执行完ninja命令后我们就可以在 src\out\Default\ 目录下找到 all.sln 这个工程文件，到这里我们就完成编译了。<br><img src="https://img-blog.csdnimg.cn/967269321b2d4e9e8df8cefaf3ac72f4.png" alt="在这里插入图片描述"></li></ul><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>]]></content>
+    
+    
+    <categories>
+      
+      <category>RTC开发</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>WebRTC</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>H264码流详解</title>
     <link href="/2021/08/14/H264%E7%A0%81%E6%B5%81%E8%AF%A6%E8%A7%A3/"/>
     <url>/2021/08/14/H264%E7%A0%81%E6%B5%81%E8%AF%A6%E8%A7%A3/</url>
